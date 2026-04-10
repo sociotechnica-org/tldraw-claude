@@ -14,8 +14,20 @@
  *   tldraw-buddy clear
  */
 
-const WS_URL = 'ws://localhost:4000'
 const TIMEOUT = 10_000
+
+function getWsUrl(): string {
+	// Read port from saved port file if available
+	const path = import.meta.dir + '/../.pids/ws-relay.port'
+	try {
+		const port = require('fs').readFileSync(path, 'utf8').trim()
+		return `ws://localhost:${port}`
+	} catch {
+		return 'ws://localhost:4000'
+	}
+}
+
+const WS_URL = getWsUrl()
 
 function parseArgs(args: string[]): { command: string; flags: Record<string, string>; positionals: string[] } {
 	const command = args[0] || 'help'

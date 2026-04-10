@@ -10,7 +10,7 @@
 
 import type { ServerWebSocket } from 'bun'
 
-const WS_PORT = 4000
+const WS_PORT = parseInt(process.env.TLDRAW_WS_PORT || '4000', 10)
 
 interface ClientData {
 	role: 'widget' | 'cli'

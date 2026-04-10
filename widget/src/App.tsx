@@ -1,7 +1,7 @@
 import { Editor, Tldraw, createShapeId, toRichText } from 'tldraw'
 import { useCallback, useEffect, useRef } from 'react'
 
-const WS_PORT = 4000
+const WS_PORT = (import.meta as any).env?.VITE_WS_PORT || 4000
 
 interface WsRequest {
 	type: string

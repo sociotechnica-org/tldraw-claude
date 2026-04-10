@@ -29,41 +29,61 @@ ensure_deps() {
 	fi
 }
 
+# Find an available port starting from the given base
+find_free_port() {
+	local port="$1"
+	while lsof -i ":$port" &>/dev/null 2>&1; do
+		port=$((port + 1))
+	done
+	echo "$port"
+}
+
 cmd_start() {
 	ensure_deps
 	mkdir -p "$PID_DIR"
 
 	# Start WS relay
 	if [ -f "$PID_DIR/ws-relay.pid" ] && kill -0 "$(cat "$PID_DIR/ws-relay.pid")" 2>/dev/null; then
-		info "WS relay already running (pid $(cat "$PID_DIR/ws-relay.pid"))"
+		local ws_port
+		ws_port="$(cat "$PID_DIR/ws-relay.port" 2>/dev/null || echo 4000)"
+		info "WS relay already running on port $ws_port (pid $(cat "$PID_DIR/ws-relay.pid"))"
 	else
-		info "Starting WebSocket relay on port 4000..."
-		bun "$WIDGET_DIR/ws-server.ts" >"$PID_DIR/ws-relay.log" 2>&1 &
+		local ws_port
+		ws_port="$(find_free_port 4000)"
+		info "Starting WebSocket relay on port $ws_port..."
+		TLDRAW_WS_PORT="$ws_port" bun "$WIDGET_DIR/ws-server.ts" >"$PID_DIR/ws-relay.log" 2>&1 &
 		echo $! >"$PID_DIR/ws-relay.pid"
-		success "WS relay started (pid $!)"
+		echo "$ws_port" >"$PID_DIR/ws-relay.port"
+		success "WS relay started (pid $!, port $ws_port)"
 	fi
 
 	# Start Vite dev server
 	if [ -f "$PID_DIR/widget.pid" ] && kill -0 "$(cat "$PID_DIR/widget.pid")" 2>/dev/null; then
-		info "Widget already running (pid $(cat "$PID_DIR/widget.pid"))"
+		local widget_port
+		widget_port="$(cat "$PID_DIR/widget.port" 2>/dev/null || echo 5173)"
+		info "Widget already running on port $widget_port (pid $(cat "$PID_DIR/widget.pid"))"
 	else
-		info "Starting tldraw widget on http://localhost:5173..."
-		(cd "$WIDGET_DIR" && bun run dev) >"$PID_DIR/widget.log" 2>&1 &
+		local widget_port
+		widget_port="$(find_free_port 5173)"
+		info "Starting tldraw widget on port $widget_port..."
+		TLDRAW_WS_PORT="$ws_port" VITE_WS_PORT="$ws_port" \
+			(cd "$WIDGET_DIR" && bun run dev -- --port "$widget_port") >"$PID_DIR/widget.log" 2>&1 &
 		echo $! >"$PID_DIR/widget.pid"
-		success "Widget started (pid $!)"
+		echo "$widget_port" >"$PID_DIR/widget.port"
+		success "Widget started (pid $!, port $widget_port)"
 	fi
 
 	echo ""
-	echo "tldraw canvas ready!"
-	echo "  Canvas:    http://localhost:5173"
-	echo "  WS relay:  ws://localhost:4000"
+	echo "tldraw-buddy ready!"
+	echo "  Canvas:    http://localhost:$widget_port"
+	echo "  WS relay:  ws://localhost:$ws_port"
 	echo ""
-	echo "Open http://localhost:5173 in your browser to see the shared canvas."
+	echo "Open http://localhost:$widget_port in your browser to see the shared canvas."
 
 	# Try to open browser
 	if command -v open &>/dev/null; then
 		sleep 2
-		open "http://localhost:5173"
+		open "http://localhost:$widget_port"
 	fi
 }
 
@@ -80,7 +100,7 @@ cmd_stop() {
 				success "Stopped $name (pid $pid)"
 				stopped=true
 			fi
-			rm -f "$pidfile"
+			rm -f "$pidfile" "$PID_DIR/$name.port"
 		fi
 	done
 
@@ -92,8 +112,11 @@ cmd_stop() {
 cmd_status() {
 	for name in ws-relay widget; do
 		local pidfile="$PID_DIR/$name.pid"
+		local portfile="$PID_DIR/$name.port"
 		if [ -f "$pidfile" ] && kill -0 "$(cat "$pidfile")" 2>/dev/null; then
-			success "$name running (pid $(cat "$pidfile"))"
+			local port
+			port="$(cat "$portfile" 2>/dev/null || echo "?")"
+			success "$name running (pid $(cat "$pidfile"), port $port)"
 		else
 			info "$name not running"
 		fi
@@ -104,7 +127,7 @@ case "${1:-help}" in
 start) cmd_start ;;
 stop) cmd_stop ;;
 status) cmd_status ;;
-snapshot | create | update | delete | connect | clear | help)
+snapshot | create | update | delete | connect | clear | save | load | help)
 	exec bun "$PLUGIN_ROOT/src/cli.ts" "$@"
 	;;
 *)
