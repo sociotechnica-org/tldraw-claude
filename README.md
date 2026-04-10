@@ -33,24 +33,15 @@ Clone https://github.com/jessmartin/tldraw-claude to ~/.tldraw-claude, run ./set
 then start the canvas with ~/.tldraw-claude/bin/tldraw-claude start.
 ```
 
-### Option B: Claude Code plugin
-
-Install directly from GitHub as a Claude Code plugin:
-
-```bash
-claude plugin marketplace add jessmartin/tldraw-claude --scope user
-claude plugin install tldraw-claude@sociotechnica --scope user
-```
-
-This registers the plugin marketplace from the GitHub repo and installs the plugin. Use `--scope project` instead to install for a single project.
-
-### Option C: Git clone
+### Option B: Git clone
 
 ```bash
 git clone https://github.com/jessmartin/tldraw-claude.git ~/.tldraw-claude
 cd ~/.tldraw-claude
 ./setup
 ```
+
+The setup installs dependencies and the plugin registers a skill that teaches Claude how to use the canvas CLI.
 
 ### Prerequisites
 
@@ -78,10 +69,6 @@ Ask Claude to draw something:
 > "Create a diagram of the database schema"
 
 ## Updating
-
-**Plugin install:** If you installed with `claude plugin marketplace add`, updates pull automatically when Claude Code starts (with `autoUpdate: true`, the default).
-
-**Git clone:** Pull and re-run setup:
 
 ```bash
 cd ~/.tldraw-claude
