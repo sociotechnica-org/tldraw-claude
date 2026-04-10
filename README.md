@@ -33,7 +33,14 @@ Clone https://github.com/jessmartin/tldraw-claude to ~/.tldraw-claude, run ./set
 then start the canvas with ~/.tldraw-claude/bin/tldraw-claude start.
 ```
 
-### Option B: Git clone
+### Option B: Claude Code plugin
+
+```bash
+claude plugin marketplace add jessmartin/tldraw-claude --scope user
+claude plugin install tldraw-claude@sociotechnica --scope user
+```
+
+### Option C: Git clone
 
 ```bash
 git clone https://github.com/jessmartin/tldraw-claude.git ~/.tldraw-claude
@@ -41,7 +48,7 @@ cd ~/.tldraw-claude
 ./setup
 ```
 
-The setup installs dependencies and the plugin registers a skill that teaches Claude how to use the canvas CLI.
+Setup installs dependencies and registers the plugin with Claude Code so the skill (which teaches Claude how to use the canvas CLI) is automatically loaded.
 
 ### Prerequisites
 
