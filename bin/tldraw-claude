@@ -100,12 +100,14 @@ cmd_status() {
 	done
 }
 
-case "${1:-start}" in
+case "${1:-help}" in
 start) cmd_start ;;
 stop) cmd_stop ;;
 status) cmd_status ;;
+snapshot | create | update | delete | connect | clear | help)
+	exec bun "$PLUGIN_ROOT/src/cli.ts" "$@"
+	;;
 *)
-	echo "Usage: tldraw-claude {start|stop|status}"
-	exit 1
+	exec bun "$PLUGIN_ROOT/src/cli.ts" "$@"
 	;;
 esac

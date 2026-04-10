@@ -8,7 +8,7 @@ A Claude Code plugin that gives Claude a shared [tldraw](https://tldraw.dev) can
 
 ## What does it do?
 
-You and Claude draw on the same canvas. You open a tldraw board in your browser, Claude gets tools to create shapes, connect them with arrows, and read what's on the canvas. You can both add and edit — it's a live, shared whiteboard.
+You and Claude draw on the same canvas. You open a tldraw board in your browser, Claude gets a CLI to create shapes, connect them with arrows, and read what's on the canvas. You can both add and edit — it's a live, shared whiteboard.
 
 Great for sketching architecture diagrams, flowcharts, database schemas, or just thinking visually together.
 
@@ -17,8 +17,10 @@ Great for sketching architecture diagrams, flowcharts, database schemas, or just
 ## How it works
 
 ```
-Claude Code ←stdio→ MCP Server ←WebSocket→ tldraw widget (browser)
+Claude Code ←Bash→ CLI ←WebSocket→ tldraw widget (browser)
 ```
+
+No MCP server needed. Claude calls the CLI via Bash, the CLI sends commands to the tldraw widget over WebSocket, and prints the result. Each command is stateless — connect, send, receive, exit.
 
 ## Install
 
@@ -28,8 +30,7 @@ Copy and paste this prompt into Claude Code and it will set everything up for yo
 
 ```
 Clone https://github.com/jessmartin/tldraw-claude to ~/.tldraw-claude, run ./setup,
-then add it to .mcp.json as an MCP server (command: bun, args: ~/.tldraw-claude/src/mcp-server.ts).
-Start the canvas with ~/.tldraw-claude/bin/tldraw-claude start.
+then start the canvas with ~/.tldraw-claude/bin/tldraw-claude start.
 ```
 
 ### Option B: Claude Code plugin
@@ -43,28 +44,13 @@ claude plugin install tldraw-claude@sociotechnica --scope user
 
 This registers the plugin marketplace from the GitHub repo and installs the plugin. Use `--scope project` instead to install for a single project.
 
-### Option C: Git clone + MCP config
+### Option C: Git clone
 
 ```bash
 git clone https://github.com/jessmartin/tldraw-claude.git ~/.tldraw-claude
 cd ~/.tldraw-claude
 ./setup
 ```
-
-Then add the MCP server to your project's `.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "tldraw": {
-      "command": "bun",
-      "args": ["/Users/you/.tldraw-claude/src/mcp-server.ts"]
-    }
-  }
-}
-```
-
-Replace the path with wherever you cloned the repo.
 
 ### Prerequisites
 
@@ -103,23 +89,19 @@ git pull
 ./setup
 ```
 
-## Tools
-
-| Tool | Description |
-|------|-------------|
-| `create_shape` | Create geo shapes, text, or notes |
-| `update_shape` | Modify position, size, color, text |
-| `delete_shapes` | Remove shapes by ID |
-| `connect_shapes` | Draw arrows between shapes |
-| `get_snapshot` | List all shapes on canvas |
-| `clear_canvas` | Wipe the canvas |
-
 ## CLI
 
 ```bash
-tldraw-claude start    # Start widget + WS relay
-tldraw-claude stop     # Stop background processes
-tldraw-claude status   # Check if services are running
+tldraw-claude start                # Start widget + WS relay
+tldraw-claude stop                 # Stop services
+tldraw-claude status               # Check service status
+tldraw-claude snapshot             # List all shapes on canvas
+tldraw-claude create --type geo    # Create a shape
+tldraw-claude update --id <id>     # Update a shape
+tldraw-claude delete <id> [id ...] # Delete shapes
+tldraw-claude connect --from --to  # Draw arrow between shapes
+tldraw-claude clear                # Clear the canvas
+tldraw-claude help                 # Show all options
 ```
 
 ## License
