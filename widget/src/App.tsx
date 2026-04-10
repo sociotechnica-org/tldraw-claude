@@ -240,7 +240,7 @@ function App() {
 
 	return (
 		<div style={{ position: 'fixed', inset: 0 }}>
-			<Tldraw onMount={(editor) => { editorRef.current = editor }} />
+			<Tldraw persistenceKey="tldraw-claude" onMount={(editor) => { editorRef.current = editor }} />
 		</div>
 	)
 }
