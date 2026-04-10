@@ -221,6 +221,8 @@ function App() {
 			ws.onmessage = (event) => {
 				try {
 					const data = JSON.parse(event.data) as WsRequest
+					// Ignore response messages (they have requestId but no command type)
+					if (!data.type) return
 					handleMessage(data)
 				} catch (err) {
 					console.error('[tldraw] Bad message:', err)
