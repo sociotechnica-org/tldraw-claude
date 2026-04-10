@@ -24,31 +24,12 @@ No MCP server needed. Claude calls the CLI via Bash, the CLI sends commands to t
 
 ## Install
 
-### Option A: Paste this into Claude Code
-
-Copy and paste this prompt into Claude Code and it will set everything up for you:
-
-```
-Clone https://github.com/jessmartin/tldraw-claude to ~/.tldraw-claude, run ./setup,
-then start the canvas with ~/.tldraw-claude/bin/tldraw-claude start.
-```
-
-### Option B: Claude Code plugin
-
 ```bash
 claude plugin marketplace add jessmartin/tldraw-claude --scope user
 claude plugin install tldraw-claude@sociotechnica --scope user
 ```
 
-### Option C: Git clone
-
-```bash
-git clone https://github.com/jessmartin/tldraw-claude.git ~/.tldraw-claude
-cd ~/.tldraw-claude
-./setup
-```
-
-Setup installs dependencies and registers the plugin with Claude Code so the skill (which teaches Claude how to use the canvas CLI) is automatically loaded.
+That's it. Claude Code will clone the repo, register the skill, and Claude learns how to use the canvas.
 
 ### Prerequisites
 
