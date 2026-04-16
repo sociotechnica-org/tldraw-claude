@@ -1,6 +1,6 @@
 {
   "name": "tldraw-buddy",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Collaborative tldraw canvas for Claude Code — draw diagrams, flowcharts, and sketches together",
   "author": {
     "name": "Jess Martin",
