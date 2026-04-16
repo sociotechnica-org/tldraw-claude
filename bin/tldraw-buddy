@@ -66,8 +66,7 @@ cmd_start() {
 		local widget_port
 		widget_port="$(find_free_port 5173)"
 		info "Starting tldraw widget on port $widget_port..."
-		TLDRAW_WS_PORT="$ws_port" VITE_WS_PORT="$ws_port" \
-			(cd "$WIDGET_DIR" && bun run dev -- --port "$widget_port") >"$PID_DIR/widget.log" 2>&1 &
+		(cd "$WIDGET_DIR" && TLDRAW_WS_PORT="$ws_port" VITE_WS_PORT="$ws_port" bun run dev -- --port "$widget_port") >"$PID_DIR/widget.log" 2>&1 &
 		echo $! >"$PID_DIR/widget.pid"
 		echo "$widget_port" >"$PID_DIR/widget.port"
 		success "Widget started (pid $!, port $widget_port)"
